@@ -2,15 +2,17 @@ const express = require('express');
 // const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const axios = require('axios');
+// const axios = require('axios');
 const logger = require('morgan');
-var path = require('path');
+// var path = require('path');
+var request = require('request');
+var cheerio = require('cheerio');
 // const routes = require("./routes");
 //require all models
 
 // var User = require('./models/user');
-// var Article = require('./models/article');
-// var Index = require('./models/index');
+var Article = require('./models/newArticle');
+// var db = require('./models/index');
 
 // app.use(routes);
 
@@ -31,35 +33,44 @@ mongoose.connect('mongodb://newuser123:newuser123@ds147411.mlab.com:47411/news4y
 //     res.sendFile(path.join(__dirname, "./client/build/index.html"));
 // });
 
-app.use(express.static('./client/build'))
-// app.get("/sports", function (req, res) {
-//     ///bleacher reaport
-//     console.log('Scraping Bleacher Report\n==================================================');
+app.use(express.static('./client/build'));
 
-//     var bleacherReportArticles = [];
+app.get("/sports", function (req, res) {
+    ///bleacher reaport
+    console.log('Scraping Bleacher Report\n==================================================');
 
-//     request("https://bleacherreport.com", (error, response, html) => {
-//         var $ = cheerio.load(html)
+    var bleacherReportArticles = [];
 
-//         $('.articleSummary').each(function () {
-//             var title = $(this).children('.commentary').children('h3').text();
-//             // console.log(title);
-//             var img = $(this).children('.articleMedia').children('a').children('img').attr('src');
-//             // console.log(img);
-//             var link = $(this).children('.articleMedia').children('a').attr('href');
-//             // console.log(link);
-//             var newArticle = {
-//                 title: title,
-//                 img: img,
-//                 link: link
-//             }
-//             bleacherReportArticles.push(newArticle);
+    request("https://bleacherreport.com", (error, response, html) => {
+        var $ = cheerio.load(html)
 
-//         });
+        $('.articleSummary').each(function () {
+            var title = $(this).children('.commentary').children('h3').text();
+            // console.log(title);
+            var img = $(this).children('.articleMedia').children('a').children('img').attr('src');
+            // console.log(img);
+            var link = $(this).children('.articleMedia').children('a').attr('href');
+            // console.log(link);
+            var newArticle = {
+                title: title,
+                img: img,
+                link: link
+            }
+            bleacherReportArticles.push(newArticle);
+            var article = new Article(newArticle)
+            article.save();
+            res.send(bleacherReportArticles);
+        });
 
-//         console.log(bleacherReportArticles);
-//         this.setState({ data: bleacherReportArticles }, () => console.log(this.state));
-//     });
-// });
+        // console.log(bleacherReportArticles);
+    });
+});
 
+app.get("/all", function(req, res) {
+    Article.find()
+    .then(function(response) {
+        console.log(response);
+        res.send(response);
+    });
+});
 app.listen(PORT, () => console.log(`Running on ${PORT}`));
