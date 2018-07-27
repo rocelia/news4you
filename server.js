@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 // const axios = require('axios');
 const logger = require('morgan');
-// var path = require('path');
+// var path = require('path');cd 
 var request = require('request');
 var cheerio = require('cheerio');
 // const routes = require("./routes");
@@ -27,7 +27,9 @@ const router = express.Router();
 app.use(bodyParser.json("public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 
-mongoose.connect('mongodb://newuser123:newuser123@ds147411.mlab.com:47411/news4you');
+// mongoose.connect('mongodb://newuser123:newuser123@ds147411.mlab.com:47411/news4you');
+mongoose.connect("mongodb://localhost/mongonews4you");
+
 
 // app.use(function (req, res) {
 //     res.sendFile(path.join(__dirname, "./client/build/index.html"));
@@ -59,8 +61,9 @@ app.get("/sports", function (req, res) {
             bleacherReportArticles.push(newArticle);
             var article = new Article(newArticle)
             article.save();
-            res.send(bleacherReportArticles);
         });
+
+        res.send(bleacherReportArticles);
 
         // console.log(bleacherReportArticles);
     });
@@ -73,4 +76,18 @@ app.get("/all", function(req, res) {
         res.send(response);
     });
 });
+
+app.post('/saved/:id', function(req, res){
+    Article.findOneAndUpdate({_id: req.params.id}, {
+      saved: true  
+    })
+    .exec(function (err, doc){
+        if (err) {
+            console.log(err);
+        } else{
+            res.send(doc);
+        }
+    });
+});
+
 app.listen(PORT, () => console.log(`Running on ${PORT}`));

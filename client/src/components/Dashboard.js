@@ -156,7 +156,10 @@ export default class Dashboard extends React.Component {
           <br></br>
           <h3 className="steezArticle" key={eachArticle.key}>{eachArticle.title}</h3>
         </a>
-        <span className="bookmark-article" uk-icon="bookmark" onClick={this.saveArticle}></span>
+        <button onclick="saveArticle()">
+        Save Articles
+        </button>
+        <span className="bookmark-article" uk-icon="bookmark" onclick={this.saveArticle}></span>
       </div>
 
     ))
